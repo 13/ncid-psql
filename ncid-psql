@@ -1,0 +1,64 @@
+#!/bin/sh
+
+# PostgreSQL
+# v0.01 7/15
+# input is 5 lines obtained from ncid
+# input: DATE\nTIME\nNUMBER\nNAME\n
+# ncid usage:
+# ncid --no-gui --program ncid-psql
+# postgresql config:
+# psql -U postgres -c "CREATE DATABASE cidcall"
+# CREATE TABLE cid (
+#	name		varchar(25) not null,
+#	number		varchar(20) not null,
+#	date		varchar(10) not null,
+#	time		varchar(5) not null,
+#	tstamp		timestamp(6) without time zone
+#);
+
+ConfigDir=/etc/ncid/conf.d
+ConfigFile=$ConfigDir/ncid-psql.conf
+
+# check if db exists
+#if sudo -i -u postgres psql -lqt | cut -d \| -f 1 | grep -w cidcall | wc -l | grep 0 ;then
+#  echo -e "CREATE DATABASE cidcall"
+#fi
+# check if table exists
+#select count(*) from pg_class where relname='cid' and relkind='r'
+
+# default (see ncid-skel.conf for description):
+psql_types="CID PID"
+
+[ -f $ConfigFile ] && . $ConfigFile
+
+read DATE
+read TIME
+read NMBR
+read VAR1
+read LINE
+read TYPE
+read VAR2
+
+# Look for $TYPE
+for i in $psql_types
+do
+    [ $i = "$TYPE" ] && { found=1; break; }
+done
+
+# Exit if $TYPE not found
+[ -z "$found" ] && exit 0
+
+if [ "$TYPE" = "MSG" -o "$TYPE" = "NOT" ]
+then
+    NAME="$VAR2"
+    MESG="$VAR1"
+    # Display Message or Notice on /dev/tty
+    #echo "$DATE|$TIME|$NMBR|$NAME|$LINE|$TYPE" > /dev/tty
+    #echo "$MESG" > /dev/tty
+else
+    NAME="$VAR1"
+    TSTAMP=$(date +"%Y-%m-%d %T")
+    sudo -i -u postgres -- psql -d cidcall -c "INSERT INTO cid (name,number,date,time,tstamp) values ('$NAME','$NMBR','$DATE','$TIME','$TSTAMP')"
+fi
+
+exit 0
