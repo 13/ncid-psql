@@ -1,20 +1,14 @@
 #!/bin/sh
 
 # PostgreSQL
-# v0.01 7/15
+# v0.02 6/16
 # input is 5 lines obtained from ncid
 # input: DATE\nTIME\nNUMBER\nNAME\n
 # ncid usage:
 # ncid --no-gui --program ncid-psql
 # postgresql config:
 # psql -U postgres -c "CREATE DATABASE cidcall"
-# CREATE TABLE cid (
-#	name		varchar(25) not null,
-#	number		varchar(20) not null,
-#	date		varchar(10) not null,
-#	time		varchar(5) not null,
-#	tstamp		timestamp(6) without time zone
-#);
+# CREATE TABLE cid (name varchar(25) not null, number varchar(20) not null,tstamp timestamp(6) without time zone);
 
 ConfigDir=/etc/ncid/conf.d
 ConfigFile=$ConfigDir/ncid-psql.conf
@@ -58,7 +52,7 @@ then
 else
     NAME="$VAR1"
     TSTAMP=$(date +"%Y-%m-%d %T")
-    sudo -i -u postgres -- psql -d cidcall -c "INSERT INTO cid (name,number,date,time,tstamp) values ('$NAME','$NMBR','$DATE','$TIME','$TSTAMP')"
+    sudo -i -u postgres -- psql -d cidcall -c "INSERT INTO cid (name,number,tstamp) values ('$NAME','$NMBR','$TSTAMP')"
 fi
 
 exit 0
