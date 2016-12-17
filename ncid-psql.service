@@ -1,5 +1,6 @@
 [Unit]
 Description=NCID client using PostgreSQL 
+Wants=ncidd.service
 After=ncidd.service
 
 [Service]
