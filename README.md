@@ -1,5 +1,4 @@
 # ncid-psql
-ncid postgresql 
 
 ## SYNOPSIS
 ncid --no-gui --module ncid-psql 
